@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:workday="http://www.mulesoft.org/schema/mule/workday" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+xmlns:db="http://www.mulesoft.org/schema/mule/db"
+xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd">
+<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4db6894a-13f0-458c-a54f-e24d0001020e" basePath="hdfc" >
+<http:listener-connection host="0.0.0.0" port="8888" />
+</http:listener-config>
+<flow name="endpointdemoFlow" doc:id="0b50eb6d-f3fa-4ebc-82af-1780e48df5ce" >
+<http:listener doc:name="Listener" doc:id="0896b6fc-2bbe-455b-b062-27cf9d33fe52" config-ref="HTTP_Listener_config" path="loan" allowedMethods="GET"/>
+<logger level="INFO" doc:name="Logger" doc:id="ecaeb610-8949-4b0d-99d0-34f06af83b04" message="customer id 34535 loan details"/>
+<set-payload value="customer id 34535 loan details" doc:name="Set Payload" doc:id="3abe3a9a-3c34-43e0-a2ed-fab600edbe8d" />
+</flow>
+<flow name="endpointdemoFlow2" doc:id="b6c0c39e-6dfd-4ebc-a82f-2e406dc8289b" >
+<http:listener doc:name="Listener" doc:id="101b008e-0765-45d8-9660-be8ede5dad9f" config-ref="HTTP_Listener_config" path="customer" allowedMethods="POST"/>
+<set-variable value="#[attributes.queryParams.name]" doc:name="Set Variable" doc:id="535ce0a6-7458-4ce5-8e44-97b4c12e72a8" variableName="varName"/>
+
+<logger level="INFO" doc:name="Logger" doc:id="4ce934d3-09fd-4a04-9786-f4be9eab4d39" message="#[vars.varName]"/>
+<logger level="INFO" doc:name="Logger" doc:id="6201cf09-e2b7-4ea7-b73c-ab06fc9044b8" message="#[attributes.headers.region]"/>
+<logger level="INFO" doc:name="Logger" doc:id="8e4b5f2f-c094-4896-8698-4b6b713aa89d" message="#[payload.name]"/>
+<set-payload value="Customer Details" doc:name="Set Payload" doc:id="acf27d4f-bc76-4c2e-86b5-fbc57b6e4bc0" />
+</flow>
+<flow name="endpointdemoFlow3" doc:id="0689c5e9-2c20-4dee-9c53-630977e7a90f" >
+<http:listener doc:name="Listener" doc:id="4fd80635-553a-478d-884e-cbf5b8623cf8" config-ref="HTTP_Listener_config" path="payment" allowedMethods="PUT"/>
+<logger level="INFO" doc:name="Logger" doc:id="b97a22da-6cad-4ea4-8767-7131a6bd8399" message="UPDATED DETAILS"/>
+
+
+<set-variable value="#[attributes.queryParams.name]" doc:name="Set Variable" doc:id="ad1e2360-c1c4-4f86-9103-774ef5ec4d46" variableName="varName"/>
+
+
+
+<set-payload value="UPDATED DETAILS" doc:name="Set Payload" doc:id="d8c36b33-8972-4c3b-a7c3-a0ce6027f75e" />
+</flow>
+<flow name="endpointdemoFlow1" doc:id="b11b34a0-eff2-4148-93eb-9a77a9d1ff92" >
+<scheduler doc:name="Scheduler" doc:id="24ec44b5-9428-4d6b-b5ed-8376a8080681" >
+<scheduling-strategy >
+
+<fixed-frequency frequency="20" timeUnit="SECONDS" />
+</scheduling-strategy>
+</scheduler>
+<logger level="INFO" doc:name="Logger" doc:id="75c40fe4-f89f-494c-a9b5-5d4cf5a81aa3" message="customer id 34535 loan details"/>
+</flow>
+</mule>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="cf33db44-fc24-40f2-a0e0-a2101ce9a12b" >
+<http:listener-connection host="0.0.0.0" port="8081" />
+</http:listener-config>
+<flow name="validationmoduleFlow" doc:id="fce5c987-8ab5-47bc-bd26-73e08ea89f91" >
+<http:listener doc:name="Listener" doc:id="48645467-4fc4-474d-bd46-0703c75d4a3d" config-ref="HTTP_Listener_config" path="/testvalidate">
+<http:error-response >
+<http:body ><![CDATA[#[payload]]]></http:body>
+</http:error-response>
+</http:listener>
+<set-variable value="#[payload.employee_name]" doc:name="employee_name" doc:id="fada9254-7282-4cac-a6d7-3e95f523445d" variableName="employee_name"/>
+<validation:is-not-null doc:name="Is not null" doc:id="2b41c97e-e259-4f88-b341-d5c8cc77c753" value="#[vars.employee_name]" message="Employee Name Can Not Be Null"/>
+<validation:is-email doc:name="Is email" doc:id="737abe04-f4fa-491c-b9f2-62322ac8ceca" email="#[payload.employee_name]" message="NOT AN EMAIL"/>
+<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="6f26c1e1-0cf0-4101-9e19-d6099503b51d" value="#[payload.employee_salary]" minValue="10" maxValue="20" message="SALARY LESS"/>
+<validation:is-ip message="IP address is not correct"  doc:name="Validation" ip="#[payload.ip]"/>
+<logger level="INFO" doc:name="Logger" message="Valid Message"/>
+<error-handler >
+<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7acd9ec2-bc96-4a98-ae3f-04e9751d6ac7" >
+<ee:transform doc:name="Transform Message" doc:id="298a43ce-203f-4a46-8273-71a94703112e" >
+<ee:message >
+<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"error message":error.description
+}
+]]></ee:set-payload>
+</ee:message>
+</ee:transform>
+</on-error-propagate>
+</error-handler>
+</flow>
+<flow name="validationmoduleFlow1" doc:id="22850612-c15d-4bba-a8dd-ef5290fccfd1" >
+<http:listener doc:name="Listener" doc:id="671e22b4-ad1a-4135-9343-9d3ae4bf506a" config-ref="HTTP_Listener_config" path="val1"/>
+<validation:all doc:name="All" doc:id="55dcf27d-855f-4823-b27f-1762c76c2000" >
+<validation:is-null doc:name="Is null" doc:id="2c2b21f1-598d-45f7-bd95-add2e32c7c6d" value="#[payload.employee_name]" message="employee_name NULL"/>
+<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="844efc32-8275-4ec6-b0c7-713867675132" value="#[payload.employee_name]" message="employee_name NOT NUMBER"/>
+<validation:is-email doc:name="Is email" doc:id="68c71bd4-0330-45b2-8233-ed9052092326" email="#[payload.employee_name]" message="employee_name NOT EMAIL"/>
+</validation:all>
+<error-handler >
+<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8f849213-960f-4734-809e-5261280bddd2" >
+<ee:transform doc:name="Transform Message" doc:id="787d7637-04ae-43e0-9398-37ae7f7e378e" >
+<ee:message >
+<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"error message":error.description
+}]]></ee:set-payload>
+</ee:message>
+</ee:transform>
+</on-error-propagate>
+</error-handler>
+</flow></mule>
